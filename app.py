@@ -22,6 +22,7 @@ def load_data():
 
 data_df = load_data()
 
+
 def get_cluster_display_names(df):
     if df.empty or 'cluster_label' not in df.columns or 'category' not in df.columns:
         return {}
@@ -120,9 +121,9 @@ def cluster_details(cluster_id_str):
     current_year = datetime.now().year
     return render_template('cluster_details.html', display_title=display_title, stories=stories_to_display, now={'year': current_year})
 
-if __name__ == '__main__':
-    if data_df.empty:
-        print("Flask app will not run properly as data could not be loaded.")
-    else:
-        print("Data loaded successfully. Starting Flask app...")
-    app.run(debug=True)
+#if __name__ == '__main__':
+#    if data_df.empty:
+#        print("Flask app will not run properly as data could not be loaded.")
+#    else:
+#        print("Data loaded successfully. Starting Flask app...")
+#    app.run(debug=True)
