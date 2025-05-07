@@ -1,51 +1,30 @@
-<!-- templates/cluster_details.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Use the display_title for the page title -->
-    <title>Stories in {{ display_title|capitalize }}</title> 
-    <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { color: #0056b3; text-transform: capitalize;} /* Capitalize */
-        h2 { color: #007bff; }
-        ul { list-style-type: none; padding: 0; }
-        li.story-item { 
-            background-color: #fff; 
-            border: 1px solid #ddd; 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            border-radius: 5px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        li.story-item strong { display: block; margin-bottom: 5px; font-size: 1.1em; color: #333; }
-        li.story-item a { color: #007bff; text-decoration: none; }
-        li.story-item a:hover { text-decoration: underline; color: #0056b3;}
-        li.story-item p.summary { font-size: 0.9em; color: #555; margin-top: 8px; line-height: 1.4; }
-        li.story-item small.source { display: block; margin-top: 8px; font-style: italic; color: #777;}
-        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: bold;}
-        .back-link:hover { text-decoration: underline; }
-        .message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px; text-align: center; }
-    </style>
+    <title>Stories in {{ display_title|capitalize }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header class="navbar">
+        <h1 class="page-title">{{ display_title }}</h1>
+    </header>
+
     <div class="container">
         <a href="{{ url_for('index') }}" class="back-link">« Back to Category List</a>
-        <!-- Use the display_title for the heading -->
-        <h1>{{ display_title }}</h1>
 
         {% if message %}
             <p class="message">{{ message }}</p>
         {% endif %}
 
         {% if stories %}
-            <ul>
+            <ul class="story-list">
                 {% for story in stories %}
                     <li class="story-item">
-                        <strong>{{ story.title }}</strong>
-                        <a href="{{ story.url }}" target="_blank">{{ story.url }}</a>
+                        <div class="story-title">{{ story.title }}</div>
+                        <div class="story-url"><a href="{{ story.url }}" target="_blank">{{ story.url }}</a></div>
                         {% if story.summary %}
                             <p class="summary">{{ story.summary }}</p>
                         {% endif %}
@@ -56,8 +35,20 @@
                 {% endfor %}
             </ul>
         {% elif not message %}
-            <p>No stories to display for this category.</p>
+            <p class="no-stories">No stories to display for this category.</p>
         {% endif %}
     </div>
+
+    <footer class="footer">
+        <p>© {{ now.year if now else '2024' }} News Aggregator</p>
+    </footer>
+     {% if not now %}
+    <script>
+        // Fallback if 'now' is not passed from Flask (e.g., for static rendering)
+        if (!document.querySelector('.footer p').textContent.includes(new Date().getFullYear())) {
+            document.querySelector('.footer p').textContent = `© ${new Date().getFullYear()} News Aggregator`;
+        }
+    </script>
+    {% endif %}
 </body>
 </html>

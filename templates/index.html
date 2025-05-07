@@ -1,52 +1,47 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News Categories</title> <!-- Changed title -->
-    <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        h1 { text-align: center; color: #0056b3; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 10px; }
-        a { text-decoration: none; color: #007bff; font-weight: bold; }
-        a:hover { text-decoration: underline; color: #0056b3; }
-        .cluster-link {
-            display: block;
-            padding: 10px 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            text-transform: capitalize; /* Capitalize the category name */
-        }
-        .cluster-link:hover {
-            background-color: #ced4da;
-        }
-        .excluded-cluster-text { color: #6c757d; font-style: italic; text-transform: none; } /* Specific style for excluded */
-    </style>
+    <title>News Categories</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header class="navbar">
+        <h1 class="main-title">News Categories</h1>
+    </header>
+
     <div class="container">
-        <h1>News Categories</h1> <!-- Changed heading -->
         {% if cluster_items %}
-            <ul>
+            <ul class="category-list">
                 {% for item in cluster_items %}
-                    <li>
-                        <a href="{{ url_for('cluster_details', cluster_id_str=item.id_str) }}" class="cluster-link">
+                    <li class="category-item">
+                        <a href="{{ url_for('cluster_details', cluster_id_str=item.id_str) }}" class="category-link">
                             {% if item.id_str == 'EXCLUDED_FROM_CLUSTERING' %}
-                                <span class="excluded-cluster-text">{{ item.name }}</span>
+                                <span class="excluded-category-text">{{ item.name }}</span>
                             {% else %}
-                                {{ item.name }}
+                                {{ item.name }} {# Assuming app.py already capitalizes if needed #}
                             {% endif %}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>No categories found or data could not be loaded.</p>
+            <p class="no-data">No categories found or data could not be loaded.</p>
         {% endif %}
     </div>
+
+    <footer class="footer">
+        <p>© {{ now.year if now else '2024' }} News Aggregator</p>
+    </footer>
+    {% if not now %}
+    <script>
+        // Fallback if 'now' is not passed from Flask (for static rendering)
+        if (!document.querySelector('.footer p').textContent.includes(new Date().getFullYear())) {
+            document.querySelector('.footer p').textContent = `© ${new Date().getFullYear()} News Aggregator`;
+        }
+    </script>
+    {% endif %}
 </body>
 </html>

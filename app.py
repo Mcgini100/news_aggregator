@@ -1,7 +1,7 @@
-# app.py
 from flask import Flask, render_template, request
 import pandas as pd
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -22,7 +22,6 @@ def load_data():
 
 data_df = load_data()
 
-# --- NEW FUNCTION TO GET CLUSTER NAMES ---
 def get_cluster_display_names(df):
     if df.empty or 'cluster_label' not in df.columns or 'category' not in df.columns:
         return {}
@@ -40,9 +39,6 @@ def get_cluster_display_names(df):
 
 
     for label in numeric_cluster_labels:
-        # Ensure we are comparing with the correct type if label is numeric
-        # The df['cluster_label'] might be object type if it contains the string 'EXCLUDED...'
-        # So, when comparing, ensure types match or convert df['cluster_label'] for comparison.
         if isinstance(label, (int, float)): # if the label from unique() is numeric
             stories_in_cluster = clustered_data[pd.to_numeric(clustered_data['cluster_label'], errors='coerce') == label]
         else: # if the label from unique() is already a string (should not happen for actual clusters now)
@@ -60,13 +56,11 @@ def get_cluster_display_names(df):
         else: # Should not happen if label comes from unique() on clustered_data
             cluster_names[str(int(label)) if isinstance(label, float) and label.is_integer() else str(label)] = f"Cluster {label} (empty)"
 
-
-    # Handle the excluded category separately if it exists
     if 'EXCLUDED_FROM_CLUSTERING' in df['cluster_label_str'].unique():
-        cluster_names['EXCLUDED_FROM_CLUSTERING'] = "Articles Not Clustered (e.g., us_news)"
+        cluster_names['EXCLUDED_FROM_CLUSTERING'] = "Articles Not Clustered (us_news)"
         
     return cluster_names
-# --- END NEW FUNCTION ---
+
 
 @app.route('/')
 def index():
@@ -74,9 +68,6 @@ def index():
         return "Error: Could not load data. Please check the server logs and ensure 'all_news_articles_with_clusters.csv' exists."
 
     cluster_display_info = get_cluster_display_names(data_df)
-
-    # Sort clusters by their numeric part if possible, then by name for display
-    # We need to handle 'EXCLUDED_FROM_CLUSTERING' separately for sorting.
     
     sorted_cluster_items = []
     excluded_item = None
@@ -93,14 +84,14 @@ def index():
                  # If cluster_id_str is not purely numeric, use it as a string key (fallback)
                 sorted_cluster_items.append({'id_str': cluster_id_str, 'name': display_name, 'sort_key': cluster_id_str})
 
-    # Sort the actual clusters
     sorted_cluster_items.sort(key=lambda x: x['sort_key'])
     
-    # Add the excluded item at the end if it exists
+   
     if excluded_item:
         sorted_cluster_items.append(excluded_item)
         
-    return render_template('index.html', cluster_items=sorted_cluster_items)
+    current_year = datetime.now().year
+    return render_template('index.html', cluster_items=sorted_cluster_items, now={'year': current_year})
 
 
 @app.route('/cluster/<cluster_id_str>')
@@ -110,7 +101,6 @@ def cluster_details(cluster_id_str):
 
     stories_in_cluster = data_df[data_df['cluster_label_str'] == cluster_id_str]
     
-    # Get the display name for the h1 tag
     cluster_names_map = get_cluster_display_names(data_df)
     display_title = cluster_names_map.get(cluster_id_str, f"Cluster {cluster_id_str}") # Fallback
 
@@ -127,7 +117,8 @@ def cluster_details(cluster_id_str):
         }
         stories_to_display.append(story_info)
         
-    return render_template('cluster_details.html', display_title=display_title, stories=stories_to_display)
+    current_year = datetime.now().year
+    return render_template('cluster_details.html', display_title=display_title, stories=stories_to_display, now={'year': current_year})
 
 if __name__ == '__main__':
     if data_df.empty:
