@@ -1,4 +1,3 @@
-# news_aggregator/items.py
 import scrapy
 
 class NewsArticleItem(scrapy.Item):

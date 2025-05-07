@@ -1,4 +1,3 @@
-# news_aggregator/spiders/bbcnews_spider.py
 import scrapy
 from news_aggregator.items import NewsArticleItem
 from urllib.parse import urljoin

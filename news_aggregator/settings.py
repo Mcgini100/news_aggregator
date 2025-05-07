@@ -1,5 +1,3 @@
-# news_aggregator/settings.py
-
 BOT_NAME = 'news_aggregator'
 
 SPIDER_MODULES = ['news_aggregator.spiders']

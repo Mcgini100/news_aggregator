@@ -1,4 +1,3 @@
-# news_aggregator/pipelines.py
 import csv
 from itemadapter import ItemAdapter
 import os
